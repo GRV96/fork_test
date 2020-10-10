@@ -79,7 +79,7 @@ void print_proc_ancestry(const Process* process) {
 	while(proc != NULL) {
 		Process* parent = proc->parent;
 		pid_t pid = proc->pid;
-		int fc = proc->fork_calls;
+		int fc = proc->fork_call;
 		pid_t ppid = -1;
 		if(parent != NULL) {
 			ppid = parent->pid;

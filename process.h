@@ -5,13 +5,13 @@
 
 typedef struct Process {
 	pid_t pid;
-	int fork_calls;
+	int fork_call;
 	struct Process* parent;
 	struct Process* children;
 	int child_count;
 } Process;
 
-void init_process(Process* process, pid_t pid, int fork_calls);
+void init_process(Process* process, pid_t pid, int fork_call);
 
 int proc_add_child(Process* process, Process* child);
 
