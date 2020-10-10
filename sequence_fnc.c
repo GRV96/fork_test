@@ -26,7 +26,7 @@ int main() {
 	create_process(&fork_calls, proc);
 
 	Process* oldest_ancestor = proc_oldest_ancestor(proc);
-	if(oldest_ancestor == NULL) {
+	if(oldest_ancestor != NULL) {
 		proc_free_descendant_mem(oldest_ancestor);
 	}
 
