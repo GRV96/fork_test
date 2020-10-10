@@ -7,6 +7,8 @@
 
 #include "process.h"
 
+int create_process(int* fork_calls, Process* current_proc);
+
 void print_fork_call_count(int fork_calls);
 
 void print_proc_ancestry(const Process* process);
@@ -24,51 +26,45 @@ int main() {
 	Process* proc = &initial_proc;
 	init_process(proc, getpid(), fork_calls);
 
-	// Fork call 1
-	pid = fork();
-	if(pid < 0) {
-		printf("Error! Process creation failed.\n");
-		return EXIT_FAILURE;
-	}
-	fork_calls++;
-
-	if(pid == 0) {
-		Process* child = (Process*) malloc(sizeof(Process));
-		if(child == NULL) {
-			printf("Error! Memory allocation failed.\n");
-			return EXIT_FAILURE;
-		}
-		init_process(child, getpid(), fork_calls);
-		proc_add_child(proc, child);
-		printf("Ancestors of process %d:\n", child->pid);
-		print_proc_ancestry(child);
-		proc = child;
-	}
-
-	// Fork call 2
-	pid = fork();
-	if(pid < 0) {
-		printf("Error! Process creation failed.\n");
-		return EXIT_FAILURE;
-	}
-	fork_calls++;
-
-	if(pid == 0) {
-		Process* child = (Process*) malloc(sizeof(Process));
-		if(child == NULL) {
-			printf("Error! Memory allocation failed.\n");
-			return EXIT_FAILURE;
-		}
-		init_process(child, getpid(), fork_calls);
-		proc_add_child(proc, child);
-		printf("Ancestors of process %d:\n", child->pid);
-		print_proc_ancestry(child);
-		proc = child;
-	}
+	create_process(&fork_calls, proc);
+	create_process(&fork_calls, proc);
 
 	proc_free_child_mem(proc_oldest_ancestor(proc));
 
 	return EXIT_SUCCESS;
+}
+
+int create_process(int* fork_calls, Process* current_proc) {
+	pid_t pid = fork();
+	if(pid < 0) {
+		printf("Error! Process creation failed.\n");
+		return -1;
+	}
+	(*fork_calls)++;
+
+	if(pid == 0) {
+		Process* child = (Process*) malloc(sizeof(Process));
+		if(child == NULL) {
+			printf("Error! Memory allocation failed.\n");
+			return -1;
+		}
+
+		init_process(child, getpid(), *fork_calls);
+		proc_add_child(current_proc, child);
+
+		if(*fork_calls < 2){
+			printf("Process %d has %d ancestor:\n",
+					child->pid, *fork_calls);
+		}
+		else {
+			printf("Process %d has %d ancestors:\n",
+					child->pid, *fork_calls);
+		}
+		print_proc_ancestry(child);
+
+		current_proc = child;
+	}
+	return 0;
 }
 
 void print_fork_call_count(int fork_calls) {
