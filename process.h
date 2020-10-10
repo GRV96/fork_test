@@ -19,4 +19,6 @@ int proc_count_grandchildren(Process* process);
 
 void proc_free_child_mem(Process* process);
 
+Process* proc_oldest_ancestor(const Process* process);
+
 #endif // PROCESS_H

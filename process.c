@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <stddef.h>
 
 #include "process.h"
 
@@ -54,4 +54,16 @@ void proc_free_child_mem(Process* process) {
 	for(i=0; i<process->child_count; i++) {
 		proc_free_child_mem(process->children+i);
 	}
+}
+
+Process* proc_oldest_ancestor(const Process* process) {
+	Process* proc = process;
+	while(1) {
+		Process* parent = proc->parent;
+		if(parent == NULL) {
+			return proc;
+		}
+		proc = parent;
+	}
+	return NULL;
 }

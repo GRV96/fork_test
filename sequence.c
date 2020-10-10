@@ -7,22 +7,26 @@
 
 #include "process.h"
 
-void print_fork_call_num(int fork_calls);
+void print_fork_call_count(int fork_calls);
 
-void print_proc_tree(const Process* processes,
-		int generation, int proc_count);
+void print_proc_ancestry(const Process* process);
+
+void print_proc_count(int proc_count);
 
 int main() {
 	int fork_calls = 0;
 	pid_t pid;
-	int proc_num = 0;
+	int proc_count = 0;
 	const pid_t initial_pid = getpid();
 
-	printf("Inital PID: %d\n", initial_pid);
+	printf("Initial PID: %d\n", initial_pid);
 
-	Process initial_proc;
-	init_process(&initial_proc, initial_pid, fork_calls);
-	Process* parent = &initial_proc;
+	Process* proc = malloc(sizeof(Process));
+	if(proc == NULL) {
+		printf("Error! Memory allocation failed.\n");
+		return EXIT_FAILURE;
+	}
+	init_process(proc, getpid(), fork_calls);
 
 	pid = fork();
 	if(pid < 0) {
@@ -31,66 +35,57 @@ int main() {
 	}
 	fork_calls++;
 
-	if(pid > 0) {
+	if(pid == 0) {
 		Process* child = (Process*) malloc(sizeof(Process));
 		if(child == NULL) {
 			printf("Error! Memory allocation failed.\n");
 			return EXIT_FAILURE;
 		}
-		init_process(child, pid, fork_calls);
-		proc_add_child(parent, child);
-		parent = child;
+		init_process(child, getpid(), fork_calls);
+		proc_add_child(proc, child);
+		printf("Ancestors of process %d:\n", child->pid);
+		print_proc_ancestry(child);
+		proc = child;
 	}
 
-	if(getpid() != initial_pid) {
-		// All processes but the initial process end here.
-		exit(0);
+	proc_free_child_mem(proc_oldest_ancestor(proc));
+	if(proc != NULL) {
+		free(proc);
 	}
-
-	if(proc_num-1 < 2) {
-		printf("%d process was created.\n", proc_num+1);
-	}
-	else {
-		printf("%d processes were created.\n", proc_num+1);
-	}
-	printf("fork_calls: %d\n", fork_calls);
-
-	Process p[] = {initial_proc};
-	print_proc_tree(p, 0, 1);
-	proc_free_child_mem(&initial_proc);
 
 	return EXIT_SUCCESS;
 }
 
-void print_proc_tree(const Process* processes,
-		int generation, int proc_count) {
-	printf("Generation %d\n\t", generation);
-
-	int i;
-	for(i=0; i<proc_count; i++) {
-		pid_t pid = processes[i].pid;
-		int fc = processes[i].fork_calls;
-		pid_t ppid = -1;
-		if(processes[i].parent != NULL) {
-			ppid = processes[i].parent->pid;
-		}
-		printf("[fc: %d, pid: %d, ppid: %d] ", fc, pid, ppid);
-	}
-	printf("\n");
-
-	for(i=0; i<proc_count; i++) {
-		if(processes[i].children != NULL) {
-			print_proc_tree(processes[i].children, generation+1,
-					processes[i].child_count);
-		}
-	}
-}
-
-void print_fork_call_num(int fork_calls) {
+void print_fork_call_count(int fork_calls) {
 	if(fork_calls < 2) {
 		printf("%d fork call\n", fork_calls);
 	}
 	else {
 		printf("%d fork calls\n", fork_calls);
+	}
+}
+
+void print_proc_ancestry(const Process* process) {
+	Process* proc = process;
+	while(proc != NULL) {
+		Process* parent = proc->parent;
+		pid_t pid = proc->pid;
+		int fc = proc->fork_calls;
+		pid_t ppid = -1;
+		if(parent != NULL) {
+			ppid = parent->pid;
+		}
+		printf("[fc: %d, pid: %d, ppid: %d] ", fc, pid, ppid);
+		proc = parent;
+	}
+	printf("\n");
+}
+
+void print_proc_count(int proc_count) {
+	if(proc_count < 2) {
+		printf("%d process was created.\n", proc_count);
+	}
+	else {
+		printf("%d processes were created.\n", proc_count);
 	}
 }
