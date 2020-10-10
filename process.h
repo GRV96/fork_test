@@ -17,7 +17,7 @@ int proc_add_child(Process* process, Process* child);
 
 int proc_count_grandchildren(Process* process);
 
-void proc_free_child_mem(Process* process);
+void proc_free_descendant_mem(Process* process);
 
 Process* proc_oldest_ancestor(const Process* process);
 

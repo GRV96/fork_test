@@ -17,7 +17,7 @@ int main() {
 
 	Process initial_proc;
 	Process* proc = &initial_proc;
-	init_process(proc, getpid(), fork_calls);
+	init_process(proc, initial_pid, fork_calls);
 
 	// Fork call 1
 	pid = fork();
@@ -91,7 +91,10 @@ int main() {
 		proc = child;
 	}
 
-	proc_free_child_mem(proc_oldest_ancestor(proc));
+	Process* oldest_ancestor = proc_oldest_ancestor(proc);
+	if(oldest_ancestor != NULL) {
+		proc_free_descendant_mem(oldest_ancestor);
+	}
 
 	return EXIT_SUCCESS;
 }

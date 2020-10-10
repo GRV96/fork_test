@@ -38,7 +38,7 @@ int proc_count_grandchildren(Process* process) {
 	return grandchild_count;
 }
 
-void proc_free_child_mem(Process* process) {
+void proc_free_descendant_mem(Process* process) {
 	if(process == NULL) {
 		return;
 	}
@@ -52,18 +52,18 @@ void proc_free_child_mem(Process* process) {
 
 	int i;
 	for(i=0; i<process->child_count; i++) {
-		proc_free_child_mem(process->children+i);
+		proc_free_descendant_mem(process->children+i);
 	}
 }
 
 Process* proc_oldest_ancestor(const Process* process) {
+	if(process->parent == NULL) {
+		return NULL;
+	}
 	Process* proc = process;
-	while(1) {
-		Process* parent = proc->parent;
-		if(parent == NULL) {
-			return proc;
-		}
+	Process* parent;
+	while((parent = proc->parent) != NULL) {
 		proc = parent;
 	}
-	return NULL;
+	return proc;
 }
