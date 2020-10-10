@@ -1,11 +1,6 @@
-#include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
 
-#include "process.h"
+#include "process.h" // Includes sys/types.h.
 
 void print_fork_call_count(int fork_calls);
 

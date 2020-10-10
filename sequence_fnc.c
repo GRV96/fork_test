@@ -1,11 +1,6 @@
-#include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
 
-#include "process.h"
+#include "process.h" // Includes sys/types.h.
 
 int create_process(int* fork_calls, Process* current_proc);
 
@@ -25,7 +20,7 @@ int main() {
 	Process initial_proc;
 	Process* proc = &initial_proc;
 	init_process(proc, getpid(), fork_calls);
-	
+
 	create_process(&fork_calls, proc);
 	create_process(&fork_calls, proc);
 	create_process(&fork_calls, proc);
