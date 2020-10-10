@@ -2,9 +2,9 @@
 
 #include "process.h"
 
-void init_process(Process* process, pid_t pid, int fork_calls) {
+void init_process(Process* process, pid_t pid, int fork_call) {
 	process->pid = pid;
-	process->fork_calls = fork_calls;
+	process->fork_call = fork_call;
 	process->parent = NULL;
 	process->children = NULL;
 	process->child_count = 0;
