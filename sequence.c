@@ -16,18 +16,36 @@ void print_proc_count(int proc_count);
 int main() {
 	int fork_calls = 0;
 	pid_t pid;
-	int proc_count = 0;
 	const pid_t initial_pid = getpid();
 
 	printf("Initial PID: %d\n", initial_pid);
 
-	Process* proc = malloc(sizeof(Process));
-	if(proc == NULL) {
-		printf("Error! Memory allocation failed.\n");
-		return EXIT_FAILURE;
-	}
+	Process initial_proc;
+	Process* proc = &initial_proc;
 	init_process(proc, getpid(), fork_calls);
 
+	// Fork call 1
+	pid = fork();
+	if(pid < 0) {
+		printf("Error! Process creation failed.\n");
+		return EXIT_FAILURE;
+	}
+	fork_calls++;
+
+	if(pid == 0) {
+		Process* child = (Process*) malloc(sizeof(Process));
+		if(child == NULL) {
+			printf("Error! Memory allocation failed.\n");
+			return EXIT_FAILURE;
+		}
+		init_process(child, getpid(), fork_calls);
+		proc_add_child(proc, child);
+		printf("Ancestors of process %d:\n", child->pid);
+		print_proc_ancestry(child);
+		proc = child;
+	}
+
+	// Fork call 2
 	pid = fork();
 	if(pid < 0) {
 		printf("Error! Process creation failed.\n");
@@ -49,9 +67,6 @@ int main() {
 	}
 
 	proc_free_child_mem(proc_oldest_ancestor(proc));
-	if(proc != NULL) {
-		free(proc);
-	}
 
 	return EXIT_SUCCESS;
 }
