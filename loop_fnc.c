@@ -57,7 +57,7 @@ int create_process(int* fork_calls, Process* current_proc) {
 		init_process(child, getpid(), *fork_calls);
 		proc_add_child(current_proc, child);
 
-		printf("Ancestors of process %d:\n", child->pid);
+		printf("Ancestry of process %d:\n", child->pid);
 		print_proc_ancestry(child);
 
 		current_proc = child;

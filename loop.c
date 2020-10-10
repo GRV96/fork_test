@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 			init_process(child, getpid(), fork_calls);
 			proc_add_child(proc, child);
 
-			printf("Ancestors of process %d:\n", child->pid);
+			printf("Ancestry of process %d:\n", child->pid);
 			print_proc_ancestry(child);
 
 			proc = child;
