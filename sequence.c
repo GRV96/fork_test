@@ -52,14 +52,7 @@ int create_process(int* fork_calls, Process* current_proc) {
 		init_process(child, getpid(), *fork_calls);
 		proc_add_child(current_proc, child);
 
-		if(*fork_calls < 2){
-			printf("Process %d has %d ancestor:\n",
-					child->pid, *fork_calls);
-		}
-		else {
-			printf("Process %d has %d ancestors:\n",
-					child->pid, *fork_calls);
-		}
+		printf("Ancestors of process %d:\n", child->pid);
 		print_proc_ancestry(child);
 
 		current_proc = child;
